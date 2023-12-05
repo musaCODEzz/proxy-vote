@@ -60,4 +60,9 @@ contract Voting {
         }
         return votingEnd - block.timestamp;
     }
+
+    //checking if an adress has voted
+    function hasVoted(address _voter) public view returns (bool) {
+        return voters[_voter];
+    }
 }
