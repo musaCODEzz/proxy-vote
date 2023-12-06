@@ -51,10 +51,6 @@ app.post("/vote", async (req, res) => {
     }
 });
 
-// app.listen(port, function () {
-//     console.log(`Listening on port ${port}`)
-// });
-
 
 app.listen(port, function () {
     const host = 'localhost'; // Replace 'localhost' with your host if needed

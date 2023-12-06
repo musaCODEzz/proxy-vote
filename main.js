@@ -1,5 +1,5 @@
 let walletAddress = "";
-let contractAddress = "0x4145695c1098558596cDf9a291730657aE7F81A3";
+let contractAddress = "0x14Bd8A27E549f3ECD6c597D481b320a4D2674eA1";
 let contractAbi = [
     {
       "inputs": [
@@ -164,36 +164,14 @@ let contractAbi = [
       "type": "function"
     }
   ];
- const expectedChainId = 11155111;
-// const connectMetamask = async() => {
-//     const provider = new ethers.providers.Web3Provider(window.ethereum);
-//     await provider.send("eth_requestAccounts", []);
-//     const signer = provider.getSigner();
-//     walletAddress = await signer.getAddress();
-//     var element = document.getElementById("metamasknotification");
-//     element.innerHTML = "Metamask is connected " + walletAddress;
-// }
-//let walletAddress; // Declaring walletAddress in a broader scope
+const expectedChainId = 11155111;
 
-// Connect to MetaMask and store wallet address in localStorage
-// document.addEventListener('DOMContentLoaded', () => {
-//   const connectButton = document.getElementById('connectButton');
-
-//   connectButton.addEventListener('click', async () => {
-//     try {
-//       // Connect to MetaMask
-//       await connectMetamask();
-//     } catch (error) {
-//       console.error('Error connecting to MetaMask:', error);
-//     }
-//   });
-// });
 const connectMetamask = async () => {
   if (window.ethereum) {
     try {
       const provider = new ethers.providers.Web3Provider(window.ethereum);
       await provider.send("eth_requestAccounts", []);
-      const signer = provider.getSigner();
+      const signer = await provider.getSigner();
       walletAddress = await signer.getAddress();
       
       // Store the wallet address or some indication of connection in localStorage or sessionStorage
@@ -216,7 +194,8 @@ const checkMetamaskConnection = async () => {
     const storedWalletAddress = localStorage.getItem('walletAddress');
     if (storedWalletAddress) {
       const provider = new ethers.providers.Web3Provider(window.ethereum);
-      const signer = provider.getSigner();
+      await provider.send("eth_requestAccounts", []);
+      const signer = await provider.getSigner();
       
       // Use the stored wallet address to check if the signer matches
       const currentAddress = await signer.getAddress();
@@ -248,28 +227,12 @@ if (currentPage === '/index.html') {
   checkMetamaskConnection();
 }
 
-// const addVote = async() => {
-//     if(walletAddress != 0) {
-//         var name = document.getElementById("vote");
-//         const provider = new ethers.providers.Web3Provider(window.ethereum);
-//         await provider.send("eth_requestAccounts", []);
-//         const signer = provider.getSigner();
-//         const contractInstance = new ethers.Contract(contractAddress, contractAbi, signer);
-//         var cand = document.getElementById("cand");
-//         cand.innerHTML = "Please wait, adding a vote in the smart contract";
-//         const tx = await contractInstance.vote(name.value);
-//         await tx.wait();
-//         cand.innerHTML = "Vote added !!!";
-//     }
-//     else {
-//         var cand = document.getElementById("cand");
-//         cand.innerHTML = "Please connect metamask first";
-//     }
-// }
+
  const addVote = async () => {
   if (window.ethereum) {
     try {
       const provider = new ethers.providers.Web3Provider(window.ethereum);
+      await provider.send("eth_requestAccounts", []);
       const network = await provider.getNetwork();
 
       // Check the network chain ID
@@ -282,7 +245,7 @@ if (currentPage === '/index.html') {
       const storedWalletAddress = localStorage.getItem('walletAddress');
 
       if (storedWalletAddress) {
-        const signer = provider.getSigner();
+        const signer = await provider.getSigner();
         const contractInstance = new ethers.Contract(contractAddress, contractAbi, signer);
         var name = document.getElementById("vote");
         var cand = document.getElementById("cand");
@@ -290,14 +253,7 @@ if (currentPage === '/index.html') {
 
         try {
           // Check if the user's wallet address has already voted
-          const hasVoted = await contractInstance.hasVoted(storedWalletAddress);
-
-          if (hasVoted) {
-            cand.innerHTML = "You have already voted. You cannot vote twice.";
-            return;
-          }
-
-          // If the user hasn't voted yet, proceed to vote
+                    // If the user hasn't voted yet, proceed to vote
           cand.innerHTML = "Please wait, adding a vote in the smart contract";
           const tx = await contractInstance.vote(name.value);
           await tx.wait();
@@ -322,33 +278,14 @@ if (currentPage === '/index.html') {
 };
 
 
-
-// const voteStatus = async() => {
-//     if(walletAddress != 0) {
-//         var status = document.getElementById("status");
-//         var remainingTime = document.getElementById("time");
-//         const provider = new ethers.providers.Web3Provider(window.ethereum);
-//         await provider.send("eth_requestAccounts", []);
-//         const signer = provider.getSigner();
-//         const contractInstance = new ethers.Contract(contractAddress, contractAbi, signer);
-//         const currentStatus = await contractInstance.getVotingStatus();
-//         const time = await contractInstance.getRemainingTime();
-//         console.log(time);
-//         status.innerHTML = currentStatus == 1 ? "Voting is currently open" : "Voting is finished";
-//         remainingTime.innerHTML = `Remaining time is ${parseInt(time, 16)} seconds`;
-//     }
-//     else {
-//         var status = document.getElementById("status");
-//         status.innerHTML = "Please connect metamask first";
-//     }
-// }
 const voteStatus = async () => {
   try {
     const storedWalletAddress = localStorage.getItem('walletAddress');
 
     if (storedWalletAddress && storedWalletAddress !== 'undefined') {
       const provider = new ethers.providers.Web3Provider(window.ethereum);
-      const signer = provider.getSigner();
+      await provider.send("eth_requestAccounts", []);
+      const signer = await provider.getSigner();
       const contractInstance = new ethers.Contract(contractAddress, contractAbi, signer);
       
       const status = document.getElementById("status");
@@ -371,33 +308,98 @@ const voteStatus = async () => {
 };
 
 
-const getAllCandidates = async() => {
-    if(walletAddress != 0) {
-        var p3 = document.getElementById("p3");
-        const provider = new ethers.providers.Web3Provider(window.ethereum);
-        await provider.send("eth_requestAccounts", []);
-        const signer = provider.getSigner();
+// const getAllCandidates = async() => {
+//     if(walletAddress != 0) {
+//         var p3 = document.getElementById("p3");
+//         const provider = new ethers.providers.Web3Provider(window.ethereum);
+//         await provider.send("eth_requestAccounts", []);
+//         const signer = provider.getSigner();
+//         const contractInstance = new ethers.Contract(contractAddress, contractAbi, signer);
+//         p3.innerHTML = "Please wait, getting all the candidates from the voting smart contract";
+//         var candidates = await contractInstance.getAllVotesOfCandiates();
+//         console.log(candidates);
+//         var table = document.getElementById("myTable");
+
+//         for (let i = 0; i < candidates.length; i++) {
+//             var row = table.insertRow();
+//             var idCell = row.insertCell();
+//             var descCell = row.insertCell();
+//             var statusCell = row.insertCell();
+
+//             idCell.innerHTML = i;
+//             descCell.innerHTML = candidates[i].name;
+//             statusCell.innerHTML = candidates[i].voteCount;
+//         }
+
+//         p3.innerHTML = "The tasks are updated"
+//     }
+//     else {
+//         var p3 = document.getElementById("p3");
+//         p3.innerHTML = "Please connect metamask first";
+//     }
+// }
+// ... (other parts of your code)
+
+const getAllCandidates = async () => {
+  if (window.ethereum) {
+    try {
+      const provider = new ethers.providers.Web3Provider(window.ethereum);
+      await provider.send("eth_requestAccounts", []);
+      const network = await provider.getNetwork();
+
+      // Check the network chain ID
+      if (network && network.chainId !== expectedChainId) {
+        const p3 = document.getElementById("p3");
+        p3.innerHTML = "Please switch to the correct network";
+        return;
+      }
+
+      const storedWalletAddress = localStorage.getItem('walletAddress');
+
+      if (storedWalletAddress) {
+        const signer = await provider.getSigner();
         const contractInstance = new ethers.Contract(contractAddress, contractAbi, signer);
+        const p3 = document.getElementById("p3");
         p3.innerHTML = "Please wait, getting all the candidates from the voting smart contract";
-        var candidates = await contractInstance.getAllVotesOfCandiates();
-        console.log(candidates);
-        var table = document.getElementById("myTable");
 
-        for (let i = 0; i < candidates.length; i++) {
-            var row = table.insertRow();
-            var idCell = row.insertCell();
-            var descCell = row.insertCell();
-            var statusCell = row.insertCell();
+        const table = document.getElementById("myTable").getElementsByTagName('tbody')[0];
+        table.innerHTML = ''; // Clear existing table content
 
-            idCell.innerHTML = i;
-            descCell.innerHTML = candidates[i].name;
-            statusCell.innerHTML = candidates[i].voteCount;
+        const candidatesCount = await contractInstance.getCandidatesCount(); // Use the new function
+        for (let i = 0; i < candidatesCount; i++) {
+          const candidateData = await contractInstance.getCandidate(i); // Use the function to fetch candidate by index
+          const row = table.insertRow();
+          const idCell = row.insertCell(0);
+          const descCell = row.insertCell(1);
+          const statusCell = row.insertCell(2);
+
+          idCell.textContent = i + 1;
+          descCell.textContent = candidateData.name; // candidate name
+          statusCell.textContent = candidateData.voteCount; // vote count
         }
 
-        p3.innerHTML = "The tasks are updated"
+        p3.innerHTML = "The candidates' list has been updated";
+      } else {
+        const p3 = document.getElementById("p3");
+        p3.innerHTML = "Please connect MetaMask first";
+      }
+    } catch (error) {
+      console.error('MetaMask connection error:', error);
+      const p3 = document.getElementById("p3");
+      if(p3){
+        p3.innerHTML = "Error connecting to MetaMask";
+      }else{
+        console.log("p3 not found");
+      }
+     
     }
-    else {
-        var p3 = document.getElementById("p3");
-        p3.innerHTML = "Please connect metamask first";
-    }
-}
+  } else {
+    const p3 = document.getElementById("p3");
+    p3.innerHTML = "MetaMask extension not detected";
+  }
+};
+
+// getAllCandidates(); // Call the function immediately when the script loads
+
+  getAllCandidates(); // Call the function immediately when the DOM content is loaded
+

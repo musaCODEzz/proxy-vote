@@ -45,8 +45,18 @@ contract Voting {
         voters[msg.sender] = true;
     }
 
-    function getAllVotesOfCandiates() public view returns (Candidate[] memory) {
-        return candidates;
+    // New function to retrieve the vote count of a candidate by index
+    function getVoteCountOfCandidate(
+        uint256 _candidateIndex
+    ) public view returns (string memory, uint256) {
+        require(
+            _candidateIndex < candidates.length,
+            "Invalid candidate index."
+        );
+        return (
+            candidates[_candidateIndex].name,
+            candidates[_candidateIndex].voteCount
+        );
     }
 
     function getVotingStatus() public view returns (bool) {
@@ -61,8 +71,19 @@ contract Voting {
         return votingEnd - block.timestamp;
     }
 
-    //checking if an adress has voted
+    // Checking if an address has voted
     function hasVoted(address _voter) public view returns (bool) {
         return voters[_voter];
+    }
+
+    function getCandidatesCount() public view returns (uint256) {
+        return candidates.length;
+    }
+
+    function getCandidate(
+        uint256 index
+    ) public view returns (string memory, uint256) {
+        require(index < candidates.length, "Invalid candidate index.");
+        return (candidates[index].name, candidates[index].voteCount);
     }
 }
